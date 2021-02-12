@@ -136,7 +136,6 @@ module.exports = (robot) ->
       orgId: process.env.HUBOT_GRAFANA_ORG_ID or ""
       apiEndpoint: process.env.HUBOT_GRAFANA_API_ENDPOINT or "dashboard-solo"
       useUid: process.env.HUBOT_GRAFANA_USE_UID or ""
-      useEpoch: process.env.HUBOT_GRAFANA_USE_EPOCH or ""
     endpoint = get_grafana_endpoint(msg)
     if not endpoint
       sendError 'No Grafana endpoint configured.', msg
@@ -240,14 +239,6 @@ module.exports = (robot) ->
           # Build links for message sending
           title = formatTitleWithTemplate(panel.title, template_map)
           db = if query.useUid then dashboard.dashboard.uid else "db"
-          if query.useEpoch
-            current_epoch_time = Math.floor(new Date().getTime() / 1000)
-            if 'm' in timespan.from
-              timespan_from_seconds = parseInt(timespan.from.replace('m', ''), 10)
-              timespan.from = current_epoch_time - timespan_from_seconds
-            if 'm' in timespan.to
-              timespan_to_seconds = parseInt(timespan.to.replace('m', ''), 10)
-              timespan.to = current_epoch_time - timespan_to_seconds
           imageUrl = "#{endpoint.host}/render/#{query.apiEndpoint}/#{db}/#{slug}/?panelId=#{panel.id}&width=#{query.width}&height=#{query.height}&from=#{timespan.from}&to=#{timespan.to}#{variables}"
           if query.tz
             imageUrl += "&tz=#{encodeURIComponent query.tz}"
